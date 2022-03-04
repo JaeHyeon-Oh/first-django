@@ -5,7 +5,7 @@ urlpatterns = [
     path('list/',views.list,name='list'),
     path('create/',views.create,name='restaurant-create'),
     path('update/',views.update,name='restaurant-update'),
-    path('delete/',views.delete,name='restaurant-delete'),
+    path('restaurant/<int:id>/delete/',views.delete,name='restaurant-delete'),
 
     path('review/list',views.review_list,name='review-list'),
     path('restaurant/<int:id>/',views.detail,name='restaurant-detail'),

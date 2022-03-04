@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from third.models import Restaurant,Review
 from django.core.paginator import Paginator
-from third.forms import RestaurantForm, ReviewForm
+from third.forms import RestaurantForm, ReviewForm, UpdateRestaurantForm
 from django.db.models import Count,Avg
 
 
@@ -30,12 +30,14 @@ def create(request):
 def update(request):
     if request.method == 'POST' and 'id' in request.POST:
         item = get_object_or_404(Restaurant, pk=request.POST.get('id'))
-        form = RestaurantForm(request.POST, instance=item)  # NOTE: instance 인자(수정대상) 지정
-        if form.is_valid():
+        password=request.POST.get("password","")
+        form = UpdateRestaurantForm(request.POST, instance=item)  # NOTE: instance 인자(수정대상) 지정
+        if form.is_valid() and password==item.password:
             item = form.save()
     elif 'id' in request.GET:
         item = get_object_or_404(Restaurant, pk=request.GET.get('id'))
         form = RestaurantForm(instance=item)
+        # form.password=""
         return render(request, 'third/update.html', {'form': form})
 
     return redirect('/third/list/')  # 리스트 화면으로 이동합니다
@@ -47,11 +49,15 @@ def detail(request,id):
         return render(request,'third/detail.html',{'item':item, 'reviews':reviews})
     return redirect('/third/list/')
 
-def delete(request):
-    if 'id' in request.GET:
-        item = get_object_or_404(Restaurant, pk=request.GET.get('id'))
-        item.delete()
-    return redirect('/third/list/')
+def delete(request,id):
+    item = get_object_or_404(Restaurant, pk=id)
+    if request.method=='POST' and 'password' in request.POST:
+        if item.password==request.POST.get('password'):
+            item.delete()
+            return redirect('list')
+
+        return redirect('restaurant-detail',id=id)
+    return render(request,'third/delete.html', {'item':item})
 
 def review_create(request,restaurant_id):
     if request.method=='POST':
