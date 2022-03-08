@@ -37,7 +37,7 @@ def update(request):
     elif 'id' in request.GET:
         item = get_object_or_404(Restaurant, pk=request.GET.get('id'))
         form = RestaurantForm(instance=item)
-        # form.password=""
+        form.password=" "
         return render(request, 'third/update.html', {'form': form})
 
     return redirect('/third/list/')  # 리스트 화면으로 이동합니다
